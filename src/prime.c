@@ -8,21 +8,20 @@ int main()
 	double start = omp_get_wtime();
 	
 	int MAX = 200000000;
-	int total = 0;
-	double sqrt_val = 0;
+	int total = 1;
 	int j = 0;
-	#pragma omp parallel default(none) shared(MAX,sqrt_val,j,total)
+	int chunk_size = MAX/72;
+	#pragma omp parallel default(none) shared(MAX,total) private(j)
 	{
-	#pragma omp for reduction(+:total) 
-	for(int i=1; i<MAX ; ++i)
+	#pragma omp for reduction(+:total) schedule(guided,2777778)  
+	for(int i=2; i<MAX ; ++i)
 	{
-		sqrt_val =(int) sqrt(i);
 		j = 2;
-		while(j < sqrt_val && (i%j)!= 0)
+		while(j < (int)sqrt(i) && (i%j)!= 0)
 		{
 			j+=1;
 		}
-		if(j < sqrt_val)
+		if(j < (int)sqrt(i))
 		{
 			continue;
 		}
@@ -33,7 +32,6 @@ int main()
 		}
 	}
 	}
-	double elapsed_time = omp_get_wtime() - start;
-	printf("Finding all prime numbers under %d took %.2f seconds and %d total primes found\n",MAX,elapsed_time,total); 
+	printf("Finding all prime numbers under %d took %.2f seconds and %d total primes found\n",MAX,omp_get_wtime()-start,total); 
 	return 0;
 }
