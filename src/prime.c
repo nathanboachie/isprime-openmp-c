@@ -4,7 +4,9 @@
 #include <math.h>
 
 int main()
-{
+{	
+	double start = omp_get_wtime();
+	
 	int MAX = 200000;
 	int total = 0;
 	double sqrt_val = 0;
@@ -27,7 +29,7 @@ int main()
 			total+=1;
 		}
 	}
-	double time = 6.0;
-	printf("Finding all prime numbers under %d took %f seconds and %d total primes found\n",MAX,time,total); 
+	double elapsed_time = omp_get_wtime() - start;
+	printf("Finding all prime numbers under %d took %.2f seconds and %d total primes found\n",MAX,elapsed_time,total); 
 	return 0;
 }
