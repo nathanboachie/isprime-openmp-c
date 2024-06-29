@@ -5,29 +5,34 @@
 
 int main()
 {
-	int MAX = 200000;
-	int total = 0;
-	double sqrt_val = 0;
+	double start = omp_get_wtime();
+	int MAX = 200000000;
+	int total = 2;
 	int j = 0;
-	for(int i=1; i<MAX ; ++i)
+	#pragma omp parallel default(none) shared(MAX,total) private(j)
 	{
-		sqrt_val =(int) sqrt(i);
+	int local_total = 0;
+	#pragma omp for schedule(guided,700)  
+	for(int i=3; i<MAX ; i++)
+	{
+		int sqrt_i = (int)sqrt(i);
 		j = 2;
-		while(j < sqrt_val && (i%j)!= 0)
+		while(j < sqrt_i && (i%j)!= 0)
 		{
 			j+=1;
 		}
-		if(j < sqrt_val)
+		if(j < sqrt_i)
 		{
 			continue;
 		}
-
 		else
 		{
-			total+=1;
+			local_total++;
 		}
 	}
-	double time = 6.0;
-	printf("Finding all prime numbers under %d took %f seconds and %d total primes found\n",MAX,time,total); 
+	#pragma omp atomic
+	total += local_total;
+	}
+	printf("Finding all prime numbers under %d took %.2f seconds and %d total primes found\n",MAX,omp_get_wtime()-start,total); 
 	return 0;
 }
